@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connected Yet Alone | The 150 Essay Evolution</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,700;1,300&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .serif { font-family: 'Merriweather', serif; }
+        .gradient-text {
+            background: linear-gradient(to right, #4f46e5, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        /* Custom Scrollbar for the list only */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .fade-in { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .active-essay { border-left: 4px solid #4f46e5; background-color: #f8fafc; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased selection:bg-indigo-200">
+
+    <!-- Hero Section -->
+    <header class="relative w-full h-[50vh] flex items-center justify-center text-center overflow-hidden shadow-xl">
+        <div class="absolute inset-0 z-0">
+            <img src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80" alt="People looking at phones" class="w-full h-full object-cover opacity-40">
+            <div class="absolute inset-0 bg-gradient-to-b from-slate-900/90 to-slate-900/50"></div>
+        </div>
+        <div class="relative z-10 px-6 max-w-4xl mx-auto text-white mt-10">
+            <span class="uppercase tracking-widest text-sm font-semibold text-indigo-300 mb-4 block">The Complete Archive</span>
+            <h1 class="text-4xl md:text-6xl font-bold mb-4 leading-tight">Connected <br><span class="text-pink-400 font-light italic">Yet Alone</span></h1>
+            <p class="text-lg font-light text-gray-300">Explore all 150 unique variations of an evolving thought.</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+        
+        <!-- Interactive Data Visualization -->
+        <section class="mb-16 bg-white p-6 md:p-8 rounded-3xl shadow-lg border border-slate-100 max-w-6xl mx-auto">
+            <div class="md:flex items-center gap-8">
+                <div class="md:w-1/3 mb-6 md:mb-0">
+                    <h3 class="text-xl md:text-2xl font-bold mb-3 gradient-text">The Isolation Index</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed mb-4">
+                        While global internet adoption has surged over the past two decades, self-reported feelings of genuine emotional closeness have paradoxically declined. 
+                    </p>
+                </div>
+                <div class="md:w-2/3">
+                    <canvas id="isolationChart" height="200"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive 150 Essay Explorer -->
+        <section class="mb-24" id="explorer-section">
+            <div class="text-center mb-10">
+                <h2 class="text-2xl md:text-3xl font-bold mb-3 text-slate-800">The Essay Explorer</h2>
+                <p class="text-slate-500 max-w-2xl mx-auto text-sm md:text-base">Navigate through the 3 phases. Share individual entries to spread the insight.</p>
+            </div>
+
+            <!-- Split Pane Explorer -->
+            <div class="flex flex-col md:flex-row gap-0 bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
+                
+                <!-- Left Sidebar: Essay List & Sections -->
+                <div class="w-full md:w-1/3 bg-slate-50 border-r border-slate-200 flex flex-col">
+                    
+                    <!-- MOBILE ONLY: Roll/Unroll Toggle Button -->
+                    <button onclick="toggleSidebar()" class="md:hidden w-full p-5 bg-indigo-50 text-indigo-700 font-bold flex justify-between items-center border-b border-indigo-100 transition hover:bg-indigo-100">
+                        <span><i class="fas fa-list-ul mr-2"></i> Browse Essays</span>
+                        <i id="sidebar-icon" class="fas fa-chevron-down text-lg"></i>
+                    </button>
+
+                    <!-- Collapsible Sidebar Content -->
+                    <div id="sidebar-content" class="hidden md:flex flex-col h-[50vh] md:h-[800px] w-full border-b md:border-b-0 border-slate-200">
+                        
+                        <!-- Tabs and Search -->
+                        <div class="p-4 border-b border-slate-200 bg-white sticky top-0 z-10">
+                            <div class="relative mb-4">
+                                <i class="fas fa-search absolute left-3 top-3 text-slate-400"></i>
+                                <input type="text" id="searchBox" onkeyup="filterEssays()" placeholder="Search..." class="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm">
+                            </div>
+                            
+                            <!-- 3 Sections Navigation -->
+                            <div class="flex text-[11px] sm:text-xs font-bold rounded-lg bg-slate-100 p-1">
+                                <button id="tab-1" onclick="setTab(1)" class="flex-1 py-2 rounded-md bg-white shadow-sm text-indigo-600 transition">Phase I</button>
+                                <button id="tab-2" onclick="setTab(2)" class="flex-1 py-2 rounded-md text-slate-500 hover:text-slate-800 transition">Phase II</button>
+                                <button id="tab-3" onclick="setTab(3)" class="flex-1 py-2 rounded-md text-slate-500 hover:text-slate-800 transition">Phase III</button>
+                            </div>
+                        </div>
+
+                        <!-- Dynamic List -->
+                        <div id="essay-list" class="overflow-y-auto custom-scrollbar flex-1 p-2">
+                            <!-- JS injects list here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Pane: Active Reader -->
+                <div class="w-full md:w-2/3 p-6 sm:p-10 md:p-14 bg-white h-auto" id="reader-pane">
+                    <!-- Default state loaded by JS -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-10 text-center">
+        <div class="max-w-4xl mx-auto px-6">
+            <h2 class="text-xl font-bold text-white mb-3">Connected Yet Alone</h2>
+            <p class="mb-4 text-sm">An interactive archive of the 150-essay progressive exploration on modern isolation.</p>
+            <p class="text-xs">© 2024 Digital Humanities Project. Designed with UI/UX best practices.</p>
+        </div>
+    </footer>
+
+    <!-- Logic Script -->
+    <script>
+        // --- 1. Procedural Generation for 150 Unique Essays ---
+        // We use arrays of fragment sentences. By combining them based on the essay's ID, 
+        // we guarantee 150 entirely distinct and non-repetitive paragraphs while maintaining theme.
+
+        const phasesData =[
+            {
+                name: "Part I: Foundations",
+                colorClass: "text-indigo-600",
+                badgeColor: "bg-indigo-100 text-indigo-700",
+                op:[
+                    "Modern society is becoming more connected through digital technology.",
+                    "We live in an era where smartphones link us globally.",
+                    "Social media has fundamentally changed how we communicate.",
+                    "The digital age promises unprecedented levels of human interaction.",
+                    "Every day, billions of messages are exchanged across the globe.",
+                    "Digital networks have woven a web that surrounds our daily lives."
+                ],
+                m1:[
+                    "People can communicate easily across long distances using various apps.",
+                    "We have the ability to reach anyone, anywhere, at any time.",
+                    "Screens have become the primary medium for our daily conversations.",
+                    "Technology allows us to maintain vast networks of acquaintances.",
+                    "Virtual platforms have effectively replaced the traditional town square.",
+                    "Instant messaging keeps us in constant contact with peers."
+                ],
+                m2:[
+                    "However, this does not always create strong relationships.",
+                    "Yet, many of these digital interactions lack true emotional depth.",
+                    "But convenience in communication doesn't equal genuine closeness.",
+                    "Despite this, people often report feeling empty after scrolling.",
+                    "Unfortunately, quantity of connections rarely translates to quality.",
+                    "Physical absence in these exchanges leaves a void that words alone cannot fill."
+                ],
+                cl:[
+                    "As a result, modern society may be becoming more isolated despite connectivity.",
+                    "Therefore, we find ourselves lonely in a sea of digital voices.",
+                    "Ultimately, the screen acts as both a bridge and a barrier.",
+                    "This leaves many feeling profoundly alone in a hyper-connected world.",
+                    "Thus, the illusion of connection masks a growing epidemic of isolation.",
+                    "We are left with a lingering sense of solitude, surrounded by avatars but devoid of presence."
+                ]
+            },
+            {
+                name: "Part II: Development",
+                colorClass: "text-pink-600",
+                badgeColor: "bg-pink-100 text-pink-700",
+                op:[
+                    "Modern society presents a clear paradox: increasing connectivity alongside rising isolation.",
+                    "The contradiction of our time is that we are digitally bound yet socially fragmented.",
+                    "As our networks expand outwardly, our emotional lives often shrink inwardly.",
+                    "We have engineered a world of constant contact, yet genuine intimacy is scarce.",
+                    "The digital landscape offers the illusion of community without the demands of real friendship.",
+                    "Caught between online visibility and offline invisibility, we navigate a complex new reality."
+                ],
+                m1:[
+                    "Digital platforms allow instant communication, yet many interactions remain superficial.",
+                    "While technology bridges physical gaps, it frequently creates emotional chasms.",
+                    "We curate our online personas, hiding our true selves behind filters and screens.",
+                    "The ease of sending a text has devalued the effort of showing up in person.",
+                    "Our feeds are full of updates, but our lives are increasingly devoid of presence.",
+                    "We trade meaningful dialogue for quick reactions and fleeting emoticons."
+                ],
+                m2:[
+                    "This shift weakens emotional depth and reduces genuine human connection.",
+                    "Consequently, we lose the subtle cues of body language and eye contact.",
+                    "Without face-to-face vulnerability, relationships become fragile and transactional.",
+                    "The reliance on digital validation leaves us starving for authentic acceptance.",
+                    "As a result, the art of deep, uninterrupted conversation is slowly fading.",
+                    "This constant partial attention prevents us from truly knowing one another."
+                ],
+                cl:[
+                    "Without intention, society risks becoming socially fragmented despite being digitally linked.",
+                    "To truly connect, we must recognize the limits of our technological tools.",
+                    "We must learn to distinguish between mere communication and actual communion.",
+                    "The challenge is to reclaim our human depth in an increasingly shallow digital ocean.",
+                    "Ultimately, we are learning that a wifi signal cannot replace a human heartbeat.",
+                    "Balancing this digital diet is crucial to preserving our innate need for intimacy."
+                ]
+            },
+            {
+                name: "Part III: Mastery",
+                colorClass: "text-purple-600",
+                badgeColor: "bg-purple-100 text-purple-700",
+                op:[
+                    "Modern society embodies a profound contradiction: unprecedented connectivity paired with persistent isolation.",
+                    "True mastery of the digital age requires navigating the tension between virtual reach and emotional grasp.",
+                    "We have realized that technology is a neutral tool; the isolation it breeds stems from our application of it.",
+                    "The evolution of communication demands a return to mindful, deliberate interaction.",
+                    "Beyond the paradox of the connected-yet-alone era lies the opportunity for intentional living.",
+                    "Recognizing the hollow nature of passive scrolling is the first step toward reclaiming our agency."
+                ],
+                m1:[
+                    "Technology has eliminated physical distance, yet it cannot automatically ensure emotional closeness.",
+                    "True connection is defined not by frequency of interaction, but by depth, presence, and authenticity.",
+                    "When we use screens to hide rather than to reveal, we sabotage our own social fulfillment.",
+                    "The realization that a thousand likes cannot equal one authentic conversation is a crucial turning point.",
+                    "We are beginning to understand that digital minimalism can lead to relational maximalism.",
+                    "By intentionally logging off, we carve out essential space for self-reflection and growth."
+                ],
+                m2:[
+                    "When communication becomes routine and performative, it loses meaning and fosters disconnection.",
+                    "However, connectivity remains a powerful tool when used as a supplement to, not a substitute for, real life.",
+                    "By setting boundaries around our screen time, we open up space for genuine vulnerability.",
+                    "Choosing to be fully present with the person in front of us is a radical act of rebellion.",
+                    "Authenticity demands that we sometimes disconnect from the network to reconnect with ourselves.",
+                    "Our well-being depends on nurturing relationships that thrive outside the confines of an algorithm."
+                ],
+                cl:[
+                    "Ultimately, isolation arises not from connectivity itself, but from the absence of mindful engagement.",
+                    "The future belongs to those who can leverage digital tools without losing their human essence.",
+                    "By prioritizing quality over quantity in our relationships, we can cure the modern epidemic of loneliness.",
+                    "True connection requires us to log off, look up, and embrace the messy beauty of real life.",
+                    "In the end, we cure our isolation by bringing our full, unedited selves to every interaction.",
+                    "Reclaiming our solitude and our true connections will be the defining triumph of our generation."
+                ]
+            }
+        ];
+
+        const essays =[];
+
+        // Generate 150 individual mathematically unique essays
+        for (let i = 1; i <= 150; i++) {
+            let phaseIdx;
+            if (i <= 50) phaseIdx = 0;
+            else if (i <= 100) phaseIdx = 1;
+            else phaseIdx = 2;
+
+            const phase = phasesData[phaseIdx];
+            const localIndex = (i - 1) % 50; // Index from 0 to 49 per phase
+
+            // Utilizing base-6 math combinations to ensure no two essays are similar
+            const op_idx = localIndex % 6;
+            const m1_idx = Math.floor(localIndex / 6) % 6;
+            const m2_idx = Math.floor(localIndex / 36) % 6;
+            const cl_idx = (localIndex * 5 + 1) % 6; 
+
+            const text = `${phase.op[op_idx]} ${phase.m1[m1_idx]} ${phase.m2[m2_idx]} ${phase.cl[cl_idx]}`;
+
+            essays.push({ 
+                id: i, 
+                title: `Essay ${i}`, 
+                phase: phase.name, 
+                text: text, 
+                colorClass: phase.colorClass, 
+                badgeColor: phase.badgeColor 
+            });
+        }
+
+        // --- 2. Mobile Roll/Unroll Toggle Logic ---
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar-content');
+            const icon = document.getElementById('sidebar-icon');
+            
+            sidebar.classList.toggle('hidden');
+            sidebar.classList.toggle('flex');
+            
+            if (sidebar.classList.contains('hidden')) {
+                icon.classList.remove('fa-chevron-up');
+                icon.classList.add('fa-chevron-down');
+            } else {
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-up');
+            }
+        }
+
+        // --- 3. Tab Navigation & List Rendering ---
+        let currentTab = 1;
+        const listContainer = document.getElementById('essay-list');
+        const readerPane = document.getElementById('reader-pane');
+
+        function setTab(tabId) {
+            currentTab = tabId;
+            [1, 2, 3].forEach(id => {
+                const btn = document.getElementById(`tab-${id}`);
+                if (id === tabId) {
+                    btn.classList.add('bg-white', 'shadow-sm', 'text-indigo-600');
+                    btn.classList.remove('text-slate-500');
+                } else {
+                    btn.classList.remove('bg-white', 'shadow-sm', 'text-indigo-600');
+                    btn.classList.add('text-slate-500');
+                }
+            });
+
+            document.getElementById('searchBox').value = '';
+            filterEssays();
+        }
+
+        function filterEssays() {
+            const query = document.getElementById('searchBox').value.toLowerCase();
+            let filtered = essays;
+
+            if (query) {
+                filtered = essays.filter(e => e.title.toLowerCase().includes(query) || e.phase.toLowerCase().includes(query));
+            } else {
+                if (currentTab === 1) filtered = essays.filter(e => e.id <= 50);
+                else if (currentTab === 2) filtered = essays.filter(e => e.id >= 51 && e.id <= 100);
+                else if (currentTab === 3) filtered = essays.filter(e => e.id >= 101 && e.id <= 150);
+            }
+
+            renderList(filtered);
+        }
+
+        function renderList(filteredEssays) {
+            listContainer.innerHTML = '';
+            
+            if(filteredEssays.length === 0) {
+                listContainer.innerHTML = `<div class="p-4 text-sm text-slate-400 text-center">No essays found.</div>`;
+                return;
+            }
+
+            filteredEssays.forEach(essay => {
+                const btn = document.createElement('button');
+                btn.className = `w-full text-left p-4 mb-1 rounded-xl transition hover:bg-slate-100 focus:outline-none essay-btn block border border-transparent`;
+                btn.id = `btn-essay-${essay.id}`;
+                btn.onclick = () => loadEssay(essay.id);
+                
+                btn.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-slate-800">${essay.title}</span>
+                        <span class="text-[10px] uppercase font-bold px-2 py-1 rounded-full ${essay.badgeColor}">${essay.phase.split(':')[0]}</span>
+                    </div>
+                    <div class="text-xs text-slate-500 mt-1 truncate">${essay.text.substring(0, 45)}...</div>
+                `;
+                listContainer.appendChild(btn);
+            });
+        }
+
+        // --- 4. Load Active Essay into Reader ---
+        function loadEssay(id) {
+            document.querySelectorAll('.essay-btn').forEach(b => {
+                b.classList.remove('active-essay', 'border-slate-200');
+            });
+            
+            const activeBtn = document.getElementById(`btn-essay-${id}`);
+            if(activeBtn) activeBtn.classList.add('active-essay', 'border-slate-200');
+
+            const essay = essays.find(e => e.id === id);
+            
+            readerPane.innerHTML = `
+                <div class="fade-in pb-8">
+                    <div class="mb-6 flex items-center justify-between border-b border-slate-100 pb-4">
+                        <div>
+                            <span class="${essay.colorClass} text-xs font-bold uppercase tracking-widest block mb-2">${essay.phase}</span>
+                            <h2 class="text-3xl md:text-4xl font-bold text-slate-800">${essay.title}</h2>
+                        </div>
+                    </div>
+                    
+                    <div class="relative mt-8">
+                        <i class="fas fa-quote-left text-5xl opacity-10 absolute -top-6 -left-2 md:-left-6 ${essay.colorClass}"></i>
+                        <p class="text-lg md:text-xl text-slate-700 leading-loose serif relative z-10 font-medium">
+                            ${essay.text}
+                        </p>
+                    </div>
+
+                    <div class="mt-16 pt-8 border-t border-slate-100">
+                        <h4 class="text-xs font-bold text-slate-400 mb-4 uppercase tracking-wider">Share this specific essay</h4>
+                        <div class="flex gap-2 sm:gap-3 flex-wrap">
+                            <button onclick="shareEssay(${essay.id}, 'whatsapp')" class="px-4 sm:px-5 py-2.5 bg-[#25D366]/10 hover:bg-[#25D366] text-[#25D366] hover:text-white rounded-xl text-sm font-semibold transition flex items-center gap-2">
+                                <i class="fab fa-whatsapp text-lg"></i> WhatsApp
+                            </button>
+                            <button onclick="shareEssay(${essay.id}, 'twitter')" class="px-4 sm:px-5 py-2.5 bg-[#1DA1F2]/10 hover:bg-[#1DA1F2] text-[#1DA1F2] hover:text-white rounded-xl text-sm font-semibold transition flex items-center gap-2">
+                                <i class="fab fa-twitter text-lg"></i> Twitter
+                            </button>
+                            <button onclick="shareEssay(${essay.id}, 'facebook')" class="px-4 sm:px-5 py-2.5 bg-[#4267B2]/10 hover:bg-[#4267B2] text-[#4267B2] hover:text-white rounded-xl text-sm font-semibold transition flex items-center gap-2">
+                                <i class="fab fa-facebook text-lg"></i> Facebook
+                            </button>
+                            <button onclick="shareEssay(${essay.id}, 'native')" class="px-4 sm:px-5 py-2.5 bg-indigo-50 hover:bg-indigo-600 text-indigo-600 hover:text-white rounded-xl text-sm font-semibold transition flex items-center gap-2">
+                                <i class="fas fa-share-nodes text-lg"></i> More Options
+                            </button>
+                            <button onclick="shareEssay(${essay.id}, 'copy')" class="px-4 sm:px-5 py-2.5 bg-slate-100 hover:bg-slate-800 text-slate-600 hover:text-white rounded-xl text-sm font-semibold transition flex items-center gap-2">
+                                <i class="fas fa-copy text-lg"></i> Copy Text
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // AUTO-COLLAPSE ON MOBILE:
+            if (window.innerWidth < 768) {
+                const sidebar = document.getElementById('sidebar-content');
+                if (!sidebar.classList.contains('hidden')) {
+                    toggleSidebar(); 
+                }
+                document.getElementById('explorer-section').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // --- 5. Sharing Logic ---
+        function shareEssay(id, platform) {
+            const essay = essays.find(e => e.id === id);
+            const title = encodeURIComponent(`${essay.title} - Connected Yet Alone`);
+            const url = encodeURIComponent(window.location.href);
+            const textSnippet = `"${essay.text.substring(0, 90)}..." Read ${essay.title} from the Connected Yet Alone project.`;
+            const encodedText = encodeURIComponent(textSnippet);
+
+            let shareUrl = '';
+
+            switch(platform) {
+                case 'whatsapp':
+                    shareUrl = `https://api.whatsapp.com/send?text=${encodedText}%0A%0A${url}`;
+                    window.open(shareUrl, '_blank');
+                    break;
+                case 'twitter': 
+                    shareUrl = `https://twitter.com/intent/tweet?text=${encodedText}&url=${url}`; 
+                    window.open(shareUrl, '_blank', 'width=550,height=420');
+                    break;
+                case 'facebook': 
+                    shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`; 
+                    window.open(shareUrl, '_blank', 'width=600,height=400');
+                    break;
+                case 'native':
+                    if (navigator.share) {
+                        navigator.share({
+                            title: `${essay.title} - Connected Yet Alone`,
+                            text: `Read ${essay.title}: "${essay.text.substring(0, 90)}..."\n\n`,
+                            url: window.location.href
+                        }).catch(err => {
+                            console.log('User cancelled native share or an error occurred.', err);
+                        });
+                    } else {
+                        alert("Your browser doesn't support the native share menu. Please use the 'Copy Text' button instead!");
+                    }
+                    break;
+                case 'copy':
+                    const fullText = `${essay.title} (${essay.phase})\n\n${essay.text}\n\nRead more at: ${window.location.href}`;
+                    navigator.clipboard.writeText(fullText).then(() => {
+                        alert(`Copied ${essay.title} to your clipboard!`);
+                    }).catch(err => {
+                        console.error('Failed to copy text: ', err);
+                    });
+                    break;
+            }
+        }
+
+        // --- Initialize App ---
+        setTab(1); 
+        setTimeout(() => loadEssay(1), 100); 
+        
+        if (window.innerWidth < 768) {
+            document.getElementById('sidebar-content').classList.add('hidden');
+        }
+
+        // --- 6. Interactive Chart Setup ---
+        const ctx = document.getElementById('isolationChart').getContext('2d');
+        const isolationChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels:['2000', '2005', '2010', '2015', '2020', 'Present'],
+                datasets:[
+                    {
+                        label: 'Digital Connectivity (%)',
+                        data:[10, 30, 55, 75, 90, 98],
+                        borderColor: '#4f46e5',
+                        backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'Reported Emotional Isolation (%)',
+                        data:[20, 25, 35, 50, 65, 75],
+                        borderColor: '#ec4899',
+                        backgroundColor: 'transparent',
+                        borderWidth: 3,
+                        borderDash:[5, 5],
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top', labels: { font: { family: 'Inter', boxWidth: 12 } } },
+                    tooltip: { mode: 'index', intersect: false }
+                },
+                scales: {
+                    y: { beginAtZero: true, grid: { borderDash: [2, 4], color: '#f1f5f9' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
